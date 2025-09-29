@@ -36,6 +36,13 @@ if (app.get("env") === "production") {
 
 app.use(session(sessionParms));
 
+const passport = require("passport");
+const passportInit = require("./passport/passportInit");
+
+passportInit();
+app.use(passport.initialize());
+app.use(passport.session());
+
 // setting up flash messages
 app.use(require("connect-flash")());
 
