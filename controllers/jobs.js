@@ -1,7 +1,9 @@
 const getAllJobs = (req, res) => {
-  res.send(
-    "<h1>GET /jobs</h1><p>Display all the job listings belonging to this user.</p>"
-  );
+  // res.send(
+  //   "<h1>GET /jobs</h1><p>Display all the job listings belonging to this user.</p>"
+  // );
+  const jobs = [];
+  res.render("jobs", { jobs });
 };
 const createJob = (req, res) => {
   res.send("<h1>POST /jobs</h1><p>Add a new job listing</p>");
