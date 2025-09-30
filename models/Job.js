@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const TaskSchema = new mongoose.Schema(
+const JobSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Please provide a task title"],
+      required: [true, "Please provide a job title"],
       maxlength: 100,
       trim: true,
     },
@@ -33,7 +33,7 @@ const TaskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Task", TaskSchema);
+module.exports = mongoose.model("Job", JobSchema);
 
 // what about id?
 
