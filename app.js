@@ -1,14 +1,15 @@
 const express = require("express");
 require("express-async-errors");
 require("dotenv").config();
+const jobsRouter = require("./routes/jobs");
 const cookieParser = require("cookie-parser");
 const csrf = require("host-csrf");
 
 const app = express();
 
 app.set("view engine", "ejs");
-app.use(require("body-parser").urlencoded({ extended: true }));
 app.use(cookieParser(process.env.SESSION_SECRET));
+app.use(require("body-parser").urlencoded({ extended: true }));
 
 // SETTING UP SESSIONS
 const session = require("express-session");
@@ -58,6 +59,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/csrf-token", (req, res) => {
+  const token = csrf.getToken(req, res); // same helper you used for res.locals._csrf
+  res.json({ csrfToken: token });
+});
+
 // ROUTES
 app.use(require("./middleware/storeLocals"));
 app.get("/", (req, res) => {
@@ -65,13 +71,14 @@ app.get("/", (req, res) => {
 });
 app.use("/sessions", require("./routes/sessionRoutes"));
 
-// SECRET WORD HANDLING
-const secretWordRouter = require("./routes/secretWord");
-app.use("/secretWord", secretWordRouter);
-
 // RUN THE AUTH MIDDLEWARE
 const auth = require("./middleware/auth");
+
+// SECRET WORD HANDLING
+const secretWordRouter = require("./routes/secretWord");
 app.use("/secretWord", auth, secretWordRouter);
+
+app.use("/jobs", auth, jobsRouter);
 
 // PAGE NOT FOUND HANDLING
 app.use((req, res) => {
