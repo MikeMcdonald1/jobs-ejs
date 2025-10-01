@@ -10,7 +10,7 @@
     <th colspan="2"></th>
   </tr>
 
-  <!-- IF there is a job to edit or delete display these buttons, if no jobs, hide them -->
+  <!-- IF there is a job to edit or delete display everything below, if no jobs, hide everything -->
   <% if (jobs && jobs.length) { %> <% jobs.forEach((job) => { %>
   <tr>
     <td><%= job.company %></td>
@@ -30,7 +30,6 @@
         <button>delete</button>
         <input type="hidden" name="_csrf" value="<%= _csrf %>" />
       </form>
-      action="/jobs/delete/<%= job.id %>"
     </td>
   </tr>
   <% }) %> <% } %>
