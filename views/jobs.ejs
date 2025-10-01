@@ -1,6 +1,7 @@
 <%- include("partials/head") %> <%- include("partials/header") %>
 
 <h2>Jobs List</h2>
+<a href="/jobs/new"> <button type="button">add new job</button> </a>
 <table id="jobs-table">
   <tr id="jobs-table-header">
     <th>Company</th>
@@ -9,22 +10,18 @@
     <th colspan="2"></th>
   </tr>
 
+  <!-- IF there is a job to edit or delete display these buttons, if no jobs, hide them -->
   <% if (jobs && jobs.length) { %> <% jobs.forEach((job) => { %>
   <tr>
     <td><%= job.company %></td>
     <td><%= job.position %></td>
     <td><%= job.status %></td>
     <td>
-      <!-- <a href="/jobs/edit/:id"><button type="button">edit</button></a> -->
       <a href="/jobs/edit/<%= job.id %>">
         <button type="button">edit</button>
       </a>
     </td>
     <td>
-      <!-- <form method="POST" action="/jobs/delete/:id" style="display: inline">
-        <button>delete</button>
-        <input type="hidden" name="_csrf" value="<%= _csrf %>" />
-      </form> -->
       <form
         method="POST"
         action="/jobs/delete/<%= job.id %>"
