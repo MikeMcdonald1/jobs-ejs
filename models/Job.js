@@ -2,32 +2,27 @@ const mongoose = require("mongoose");
 
 const JobSchema = new mongoose.Schema(
   {
-    title: {
+    company: {
       type: String,
-      required: [true, "Please provide a job title"],
+      required: [true, "Company is required"],
       maxlength: 100,
       trim: true,
+    },
+    position: {
+      type: String,
+      required: [true, "Position is required"],
+      maxlength: 100,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "interview", "declined", "accepted"],
+      default: "pending",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    status: {
-      type: String,
-      enum: ["todo", "in-progress", "done", "skipped"],
-      default: "todo",
-    },
-    assignees: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    recurrence: {
-      type: String,
-      enum: ["never", "daily", "weekly"],
-      default: "never",
     },
   },
   { timestamps: true }
