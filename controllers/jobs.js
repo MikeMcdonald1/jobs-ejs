@@ -1,14 +1,17 @@
 const Job = require("../models/Job");
+const parseValidationErrors = require("../utils/parseValidationErrors");
 
 const getAllJobs = async (req, res) => {
-  const jobs = await Job.find({ createdBy: req.user.userId }).sort("createdAt");
+  const userId = req.user?._id || req.user?.id || req.session?.userId;
+  const jobs = await Job.find({ createdBy: userId }).sort({ createdAt: -1 });
   res.render("jobs", { jobs });
 };
 
 const createJob = async (req, res) => {
-  req.body.createdBy = req.user.userId;
+  const userId = req.user?._id || req.user?.id || req.session?.userId;
+  console.log("req.user =", req.user);
+  req.body.createdBy = userId;
   const job = await Job.create(req.body);
-  // res.status(StatusCodes.CREATED).json({ job });
   res.redirect("/jobs");
 };
 

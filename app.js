@@ -5,6 +5,11 @@ const jobsRouter = require("./routes/jobs");
 const cookieParser = require("cookie-parser");
 const csrf = require("host-csrf");
 
+// EXTRA SECURITY PACKAGES
+const helmet = require("helmet");
+const xss = require("xss-sanitize");
+const rateLimiter = require("express-rate-limit");
+
 const app = express();
 
 app.set("view engine", "ejs");
@@ -63,6 +68,16 @@ app.get("/csrf-token", (req, res) => {
   const token = csrf.getToken(req, res); // same helper you used for res.locals._csrf
   res.json({ csrfToken: token });
 });
+
+// EXTRA SECURITY PACKAGES
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  })
+);
+app.use(helmet());
+app.use(xss());
 
 // ROUTES
 app.use(require("./middleware/storeLocals"));
