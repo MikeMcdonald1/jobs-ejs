@@ -20,9 +20,9 @@ const JobSchema = new mongoose.Schema(
       default: "pending",
     },
     createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
