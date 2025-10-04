@@ -43,8 +43,16 @@ const updateJob = async (req, res) => {
   res.redirect("/jobs");
 };
 
-const deleteJob = (req, res) => {
-  const { id } = req.params;
+const deleteJob = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req;
+
+  const job = await Job.findByIdAndDelete({
+    _id: jobId,
+    createdBy: userId,
+  });
   res.redirect("/jobs");
 };
 
