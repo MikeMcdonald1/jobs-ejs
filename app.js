@@ -4,6 +4,7 @@ require("dotenv").config();
 const jobsRouter = require("./routes/jobs");
 const cookieParser = require("cookie-parser");
 const csrf = require("host-csrf");
+const flash = require("connect-flash");
 
 // EXTRA SECURITY PACKAGES
 const helmet = require("helmet");
@@ -74,6 +75,7 @@ app.use(
   rateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 100,
+    message: "Too many requests from this IP address, try again later.",
   })
 );
 app.use(helmet());
@@ -93,6 +95,7 @@ const auth = require("./middleware/auth");
 const secretWordRouter = require("./routes/secretWord");
 app.use("/secretWord", auth, secretWordRouter);
 
+// ERROR HANDLING MIDDLEWARE
 app.use("/jobs", auth, jobsRouter);
 
 // PAGE NOT FOUND HANDLING
