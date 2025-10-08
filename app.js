@@ -1,19 +1,28 @@
 const express = require("express");
 require("express-async-errors");
+require("dotenv").config();
+const jobsRouter = require("./routes/jobs");
+const cookieParser = require("cookie-parser");
+const csrf = require("host-csrf");
+const flash = require("connect-flash");
+
+// EXTRA SECURITY PACKAGES
+const helmet = require("helmet");
+const xss = require("xss-sanitize");
+const rateLimiter = require("express-rate-limit");
 
 const app = express();
 
 app.set("view engine", "ejs");
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(require("body-parser").urlencoded({ extended: true }));
 
-// setting up sessions
-require("dotenv").config(); // to load the .env file into the process.env object
+// SETTING UP SESSIONS
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const url = process.env.MONGO_URI;
 
 const store = new MongoDBStore({
-  // may throw an error, which won't be caught
   uri: url,
   collection: "mySessions",
 });
@@ -36,6 +45,7 @@ if (app.get("env") === "production") {
 
 app.use(session(sessionParms));
 
+// USING PASSPORT
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
 
@@ -43,29 +53,57 @@ passportInit();
 app.use(passport.initialize());
 app.use(passport.session());
 
-// setting up flash messages
+// SETTING UP FLASH MESSAGES
 app.use(require("connect-flash")());
 
+// CSRF MIDDLEWARE
+const csrfMiddleware = csrf.csrf();
+app.use(csrfMiddleware);
+
+app.use((req, res, next) => {
+  res.locals._csrf = csrf.getToken(req, res);
+  next();
+});
+
+app.get("/csrf-token", (req, res) => {
+  const token = csrf.getToken(req, res); // same helper you used for res.locals._csrf
+  res.json({ csrfToken: token });
+});
+
+// EXTRA SECURITY PACKAGES
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: "Too many requests from this IP address, try again later.",
+  })
+);
+app.use(helmet());
+app.use(xss());
+
+// ROUTES
 app.use(require("./middleware/storeLocals"));
 app.get("/", (req, res) => {
   res.render("index");
 });
 app.use("/sessions", require("./routes/sessionRoutes"));
 
-// secret word handling
-const secretWordRouter = require("./routes/secretWord");
-app.use("/secretWord", secretWordRouter);
-
-// run the auth middleware
+// RUN THE AUTH MIDDLEWARE
 const auth = require("./middleware/auth");
+
+// SECRET WORD HANDLING
+const secretWordRouter = require("./routes/secretWord");
 app.use("/secretWord", auth, secretWordRouter);
 
-// page not found handling
+// ERROR HANDLING MIDDLEWARE
+app.use("/jobs", auth, jobsRouter);
+
+// PAGE NOT FOUND HANDLING
 app.use((req, res) => {
   res.status(404).send(`That page (${req.url}) was not found.`);
 });
 
-// 500 error handling
+// 500 ERROR HANDLING
 app.use((err, req, res, next) => {
   res.status(500).send(err.message);
   console.log(err);

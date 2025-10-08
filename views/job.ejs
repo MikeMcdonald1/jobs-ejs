@@ -1,0 +1,53 @@
+<%- include("partials/head") %> <%- include("partials/header") %> <% const
+isEdit = !!job; const title = isEdit ? "Edit Job" : "Add New Job"; const
+buttonText = isEdit ? "Update" : "Create"; const action = isEdit ?
+`/jobs/update/${job.id}` : "/jobs"; const company = isEdit ? job.company : "";
+const position = isEdit ? job.position : ""; const status = isEdit ? job.status
+: "pending"; const selPending = status === "pending" ? "selected" : ""; const
+selInterview = status === 'interview' ? 'selected' : ''; const selDeclined =
+status === 'declined' ? 'selected' : ''; const selAccepted = status ===
+'accepted' ? 'selected' : ''; %>
+
+<h2><%= title %></h2>
+
+<form method="POST" action="<%= action %>">
+  <div>
+    <label for="company">Company</label>
+    <input
+      id="company"
+      name="company"
+      type="text"
+      required
+      value="<%= company %>"
+    />
+  </div>
+
+  <div>
+    <label for="position">Position</label>
+    <input
+      id="position"
+      name="position"
+      type="text"
+      required
+      value="<%= position %>"
+    />
+  </div>
+
+  <div>
+    <label for="status">Status</label>
+    <select id="status" name="status" required>
+      <option value="pending" <%="selPending" %>>pending</option>
+      <option value="interview" <%="selInterview" %>>interview</option>
+      <option value="declined" <%="selDeclined" %>>declined</option>
+      <option value="accepted" <%="selAccepted" %>>accepted</option>
+    </select>
+  </div>
+
+  <div style="margin-top: 12px">
+    <button type="submit"><%= buttonText %></button>
+    <a href="/jobs"><button type="button">Cancel</button></a>
+  </div>
+  <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+</form>
+
+<%- include("partials/footer") %>
